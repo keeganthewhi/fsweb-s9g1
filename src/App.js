@@ -19,7 +19,8 @@ function App() {
   }
 
   function handleComplete(id) {
-    console.log("tamamlama fonksiyonunu buraya yazın");
+    tasks.filter((item) => item.id === id)[0].status = "yapıldı";
+    setTasks([...tasks]);
   }
 
   return (

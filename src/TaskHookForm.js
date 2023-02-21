@@ -1,6 +1,7 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import { ToastContainer, toast } from "react-toastify";
+import { nanoid } from "nanoid";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function TaskHookForm({ kisiler, submitFn }) {
@@ -9,20 +10,49 @@ export default function TaskHookForm({ kisiler, submitFn }) {
     handleSubmit,
     formState: { errors, isValid },
   } = useForm({
-    mode: "onBlur",
+    mode: "onChange",
     defaultValues: {
       title: "",
       description: "",
       people: [],
     },
   });
-  const notify = () => toast("Wow so easy!");
 
-  const onSubmit = (data) => console.log(data);
+  // const onSubmit = (data) => {
+  //     submitFn({
+  //       ...data,
+  //       id: nanoid(5),
+  //       status: "yapılacak",
+  //     });
+  //     basariliEklemeToastify();
+  //     console.log(data);
+  // };
   console.log(errors);
+
+  function mySubmit(data) {
+    console.log(data);
+    toast("Wow so easy!");
+    submitFn({
+      ...data,
+      id: nanoid(5),
+      status: "yapılacak",
+    });
+    // e.preventDefault();
+    // submitFn({
+    //   ...formData,
+    //   id: nanoid(5),
+    //   status: "yapılacak",
+    // });
+    // setFormData({
+    //   title: "",
+    //   description: "",
+    //   people: [],
+    // });
+  }
+
   return (
     <div>
-      <form className="taskForm" onSubmit={handleSubmit(onSubmit)}>
+      <form className="taskForm" onSubmit={handleSubmit(mySubmit)}>
         <div className="form-line">
           <label className="input-label" htmlFor="title">
             Başlık
@@ -30,16 +60,18 @@ export default function TaskHookForm({ kisiler, submitFn }) {
           <input
             className="input-text"
             id="title"
-            name="title"
             type="text"
             {...register("title", {
               required: "Task başlığı yazmalısınız",
-              minLength: 3,
-              message: "Task başlığı en az 3 karakter olmalı",
+              minLength: {
+                value: 3,
+                message: "Task başlığı en az 3 karakter olmalı",
+              },
             })}
           />
           {errors.title && <p>{errors.title.message}</p>}
         </div>
+
         <div className="form-line">
           <label className="input-label" htmlFor="description">
             Açıklama
@@ -48,11 +80,12 @@ export default function TaskHookForm({ kisiler, submitFn }) {
             className="input-textarea"
             rows="3"
             id="description"
-            name="description"
             {...register("description", {
               required: "Task açıklaması yazmalısınız",
-              minLength: 10,
-              message: "Task açıklaması en az 10 karakter olmalı",
+              minLength: {
+                value: 10,
+                message: "Task açıklaması en az 10 karakter olmalı",
+              },
             })}
           />
           {errors.description && <p>{errors.description.message}</p>}
@@ -63,23 +96,32 @@ export default function TaskHookForm({ kisiler, submitFn }) {
           <div>
             {kisiler.map((p) => (
               <label className="input-checkbox" key={p}>
-                <input type="checkbox" name="people" />
+                <input
+                  type="checkbox"
+                  {...register("people", {
+                    required: "Lütfen en az 1 kişi seçin",
+                    // required: {
+                    //   value: true,
+                    //   message: "En az 1 kişi seçin",
+                    // },
+                    validate: {
+                      maxKisi: (kisiler) =>
+                        kisiler.length <= 3 || "En fazla 3 kişi seçebilirsiniz",
+                    },
+                  })}
+                  value={p}
+                />
                 {p}
               </label>
             ))}
           </div>
+          {errors.people && <p>{errors.people.message}</p>}
         </div>
 
         <div className="form-line">
-          <button
-            className="submit-button"
-            type="submit"
-            onClick={notify}
-            disabled={!isValid}
-          >
+          <button className="submit-button" type="submit" disabled={!isValid}>
             Kaydet
           </button>
-          <ToastContainer />
         </div>
       </form>
     </div>

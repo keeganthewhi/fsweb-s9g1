@@ -23,7 +23,7 @@ const PeopleForm = ({ kisiler, submitFn }) => {
   }
 
   return (
-    <form className="taskForm">
+    <form className="taskForm" onSubmit={handleSubmit}>
       <div className="form-line">
         <label className="input-label" htmlFor="title">
           İsim
